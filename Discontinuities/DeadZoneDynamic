@@ -1,0 +1,57 @@
+-- 27.12.2017 08:41:04 AR V1.0a
+
+generic = {
+  parameter = {
+  },
+
+  init = function(self)
+    block.setInputsPinCount(3)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Dead Zone', [[
+Output zero within a specified region (dead zone).
+Input is (2), upper is (1) ann lower is (3)
+]])
+    gui.setSize()
+  end,
+
+  apply = function(self)
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "", [[
+      draw.line(px(15), py(50), px(85), py(50))
+      draw.line(px(50), py(15), px(50), py(85))
+      draw.line(px(20), py(80), px(40), py(50), px(60), py(50), px(80), py(20))
+    ]])
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = function(upper, a, lower)
+            if a > upper then
+              return a - upper
+            end
+            if a < lower then
+              return a - lower
+            end
+            return 0
+          end
+
+        }
+      ]==]
+    return source
+  end,
+
+}
+

@@ -1,0 +1,48 @@
+-- 14.07.2017 17:07:36 AR V1.0a
+
+generic = {
+
+  init = function(self)
+    block.setInputsPinCount(2)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Comperator', 'if a == b result is 0. If a > b result is +1 else -1')
+    gui.setSize()
+  end,
+
+  apply = function(self)
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x43)
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        local block = {}
+
+          block.step = function(a, b)
+            if a > b then
+              return 1
+            end
+            if a < b then
+              return -1
+            end
+            return 0
+          end
+
+        return block
+      ]==]
+    return source
+  end,
+
+}
+

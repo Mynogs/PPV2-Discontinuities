@@ -1,0 +1,67 @@
+-- V1.0a AR
+-- 30.12.2016 11:23:41 AR V1.0b
+
+generic = {
+  parameter = {
+    upperSaturation = 1.0,
+    lowerSaturation = 0.0,
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Saturation', 'Limit input signal to the upper and lower\nsaturation values')
+    gui.add('Edit', 'EditUpperSaturation', 'Upper saturation')
+    gui.set('EditUpperSaturation', 'Number', self.parameter.upperSaturation)
+    gui.add('Edit', 'EditLowerSaturation', 'Lower saturation')
+    gui.set('EditLowerSaturation', 'Number', self.parameter.lowerSaturation)
+    gui.setSize()
+  end,
+
+  apply = function(self)
+    self.parameter.upperSaturation = gui.get('EditUpperSaturation', 'Number')
+    self.parameter.lowerSaturation = gui.get('EditLowerSaturation', 'Number')
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "", [[
+      draw.line(px(15), py(50), px(85), py(50))
+      draw.line(px(50), py(15), px(50), py(85))
+      draw.line(px(20), py(80), px(40), py(80), px(60), py(20), px(80), py(20))
+    ]])
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = function(a)
+            if a > UPPER then
+              return UPPER
+            end
+            if a < LOWER then
+              return LOWER
+            end
+            return a
+          end
+
+        }
+      ]==]
+    local replaces = {
+      ['UPPER'] = self.parameter.upperSaturation,
+      ['LOWER'] = self.parameter.lowerSaturation,
+    }
+    return string.gsub(source, '%a+', replaces)
+  end,
+
+}
+

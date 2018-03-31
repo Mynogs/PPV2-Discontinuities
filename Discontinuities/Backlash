@@ -1,0 +1,69 @@
+-- 26.12.2017 11:15:56 AR V1.0a
+
+generic = {
+  parameter = {
+    deadband = 1.0,
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Deadband', [[
+If the in-/output difference less then Deadband / 2 the output don't change.
+Otherwise the output follows the input with a difference of Deadband / 2.
+This is the simulation of a 'drag indicator'-
+]])
+    gui.add('Edit', 'EditDeadband', 'Deadband')
+    gui.set('EditDeadband', 'Number', self.parameter.deadband)
+    gui.setSize()
+  end,
+
+  apply = function(self)
+    self.parameter.deadband = gui.get('EditDeadband', 'Number')
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "", [[
+      draw.line(px(15), py(50), px(85), py(50))
+      draw.line(px(50), py(15), px(50), py(85))
+      draw.line(px(20), py(80), px(40), py(40), px(70), py(40))
+      draw.line(px(80), py(20), px(60), py(60), px(30), py(60))
+    ]])
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        local block = {}
+
+          block.start = function()
+            block.q = 0
+          end
+
+          block.step = function(a)
+            local d = a - block.q
+            if d >= DEADBAND then
+              block.q = a - DEADBAND
+            elseif d <= -DEADBAND then
+              block.q = a + DEADBAND
+            end
+            return block.q
+          end
+
+        return block
+      ]==]
+    local replaces = {
+      ['DEADBAND'] = self.parameter.deadband / 2.0,
+    }
+    return string.gsub(source, '%a+', replaces)
+  end,
+
+}
+

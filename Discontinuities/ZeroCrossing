@@ -1,0 +1,71 @@
+
+generic = {
+  parameter = {
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Zero Crossing', [[
+Output 1 is input goes from negativ to positiv.
+Output -1 is input goes from positiv to negativ.
+Else output 0
+  ]])
+    gui.setSize()
+  end,
+
+  apply = function(self)
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "", [[
+      draw.line(px(15), py(50), px(85), py(50))
+      draw.line(px(50), py(15), px(50), py(85))
+      local p = {}
+      for i = 0, 80, 0.1 do
+        p[#p + 1] = px(10 + i)
+        p[#p + 1] = py(50 + math.cos(i / 40 * math.pi) * 30)
+      end
+      draw.line(table.unpack(p))
+      draw.line(px(30), py(50), px(30), py(20))
+      draw.line(px(70), py(50), px(70), py(80))
+    ]])
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = function(a)
+            local q = 0
+            if block.a then
+              if block.a < 0 and a >= 0 then
+                q = 1
+              elseif block.a >= 0 and a < 0 then
+                q = -1
+              end
+            end
+            block.a = a
+            return q
+          end
+
+        }
+      ]==]
+    local replaces = {
+      ['UPPER'] = self.parameter.upper,
+      ['LOWER'] = self.parameter.lower,
+    }
+    return string.gsub(source, '%a+', replaces)
+  end,
+
+}
+

@@ -1,0 +1,65 @@
+
+generic = {
+  parameter = {
+    upper = 0.5,
+    lower = -0.5,
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Dead Zone', 'Output zero within a specified region (dead zone)')
+    gui.add('Edit', 'EditUpper', 'Upper limit')
+    gui.add('Edit', 'EditLower', 'Lower limit')
+    gui.set('EditUpper', 'Number', self.parameter.upper)
+    gui.set('EditLower', 'Number', self.parameter.lower)
+    gui.setSize()
+  end,
+
+  apply = function(self)
+    self.parameter.upper = gui.get('EditUpper', 'Number')
+    self.parameter.lower = gui.get('EditLower', 'Number')
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "", [[
+      draw.line(px(15), py(50), px(85), py(50))
+      draw.line(px(50), py(15), px(50), py(85))
+      draw.line(px(20), py(80), px(40), py(50), px(60), py(50), px(80), py(20))
+    ]])
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = function(a)
+            if a > UPPER then
+              return a - UPPER
+            end
+            if a < LOWER then
+              return a - LOWER
+            end
+            return 0
+          end
+
+        }
+      ]==]
+    local replaces = {
+      ['UPPER'] = self.parameter.upper,
+      ['LOWER'] = self.parameter.lower,
+    }
+    return string.gsub(source, '%a+', replaces)
+  end,
+
+}
+

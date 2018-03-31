@@ -1,0 +1,66 @@
+-- 18.07.2017 09:09:23 AR V1.0a
+
+block.setSize(51, 51)
+
+generic = {
+  parameter = {
+    table = '0\n10\n20\n30\n',
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Window Comperator', [[
+ Output is 0 if input value less the lowest window range (row 1)
+ Output is 1 if value is in the first range (row 1 and 2)
+ Output is 2 if value is in the second range (row 2 and 3)
+ ...
+ Output is the number of rows if value is greater the higest window range (last row)
+ ]])
+    gui.add('Memo', 'MemoTable', 'Table rows\n\n(First line is row 1)', {Width = 300, Height = 200})
+    gui.set('MemoTable', 'Text', self.parameter.table)
+    gui.setSize()
+  end,
+
+  apply = function(self)
+    self.parameter.table = gui.get('MemoTable', 'Text')
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x43)
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        local block = {}
+
+          block.step = function(a)
+            STEP
+          end
+
+        return block
+      ]==]
+
+    local step = ''
+    local q = 0
+    for n in self.parameter.table:gmatch'[-.%d]+' do
+      step = step .. '\nif a < ' .. tonumber(n) .. ' then return ' .. q .. ' end'
+      q = q + 1
+    end
+    step = step .. '\nreturn ' .. q .. '\n'
+    local replaces = {}
+    replaces['STEP'] = step
+    return string.gsub(source, '%a+', replaces)
+  end,
+
+}
+

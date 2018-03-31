@@ -1,0 +1,56 @@
+-- V1.0a AR
+-- 30.12.2016 11:25:11 AR V1.0b
+-- 27.12.2017 08:39:02 AR V1.0c Remove input pin names
+
+generic = {
+  parameter = {
+  },
+
+  init = function(self)
+    block.setInputsPinCount(3)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Saturation Dynamic', 'Limit input signal (2) to the upper (1) and lower (3)\nsaturation values')
+    gui.setSize()
+  end,
+
+  apply = function(self)
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "", [[
+      draw.line(px(15), py(50), px(85), py(50))
+      draw.line(px(50), py(15), px(50), py(85))
+      draw.line(px(20), py(80), px(40), py(80), px(60), py(20), px(80), py(20))
+    ]])
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = function(upper, a, lower)
+            if a > upper then
+              return upper
+            end
+            if a < lower then
+              return lower
+            end
+            return a
+          end
+
+        }
+      ]==]
+    return source
+  end,
+
+}
+
