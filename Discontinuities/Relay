@@ -3,12 +3,14 @@
 -- 21.06.2017 14:16:07 AR V1.0c
 -- 22.06.2017 09:01:58 AR V1.0d
 -- 14.07.2017 17:12:55 AR V1.0d
+-- 01.11.2018 11:32:51 AR V1.0e Negate
 
 generic = {
   name = 'Relay',
   parameter = {
     onPoint = 1.0,
     offPoint = -1.0,
+    negate = false,
   },
 
   init = function(self)
@@ -19,17 +21,23 @@ generic = {
   end,
 
   open = function(self)
-    gui.add('Info', 'Info', self.name, "Output the specified 'on' or 'off' value by\ncomparing the input to the specified thresholds")
+    gui.add('Info', 'Info', self.name, [[
+Output the specified 'on' or 'off' value by
+comparing the input to the specified thresholds
+]])
     gui.add('Edit', 'EditOnPoint', 'Switch on point')
-    gui.set('EditOnPoint', 'Number', self.parameter.onPoint)
     gui.add('Edit', 'EditOffPoint', 'Switch off point')
+    gui.add('CheckBox', 'CheckBoxNegate', 'Negate output')
+    gui.set('EditOnPoint', 'Number', self.parameter.onPoint)
     gui.set('EditOffPoint', 'Number', self.parameter.offPoint)
+    gui.set('CheckBoxNegate', 'Checked', self.parameter.negate)
     gui.setSize()
   end,
 
   apply = function(self)
     self.parameter.onPoint = gui.get('EditOnPoint', 'Number')
     self.parameter.offPoint = gui.get('EditOffPoint', 'Number')
+    self.parameter.negate = gui.get('CheckBoxNegate', 'Checked')
     return gui.assert(
       self.name,
       self.parameter.onPoint > self.parameter.offPoint, 'Switch on point must be greater then the switch off point')
@@ -62,7 +70,7 @@ generic = {
             elseif a <= OFF then
               block.q = false
             end
-            return block.q
+            return NOT block.q
           end
 
         return block
@@ -70,6 +78,7 @@ generic = {
     local replaces = {
       ['ON'] = self.parameter.onPoint,
       ['OFF'] = self.parameter.offPoint,
+      ['NOT'] = self.parameter.negate and 'not' or '',
     }
     return string.gsub(source, '%a+', replaces)
   end,
