@@ -1,0 +1,73 @@
+-- 24.12.2018 11:57:43 AR V1.0a
+
+generic = {
+  parameter = {
+    rate = 1.0,
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Rate', 'Output signal will no change faster then the rate')
+    gui.add('Edit', 'EditRate', 'Rate [1/s]')
+    gui.set('EditRate', 'Number', self.parameter.rate)
+    gui.setSize()
+  end,
+
+  apply = function(self)
+    self.parameter.rate = gui.get('EditRate', 'Number')
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "", [[
+      draw.line(px(15), py(50), px(85), py(50))
+      draw.line(px(50), py(15), px(50), py(85))
+      draw.setColorA(0.7, 0.7, 0.7)
+      draw.line(px(20), py(80), px(80), py(20))
+      draw.setColorA(0, 0, 0)
+      draw.line(px(20), py(60), px(80), py(40))
+    ]])
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        local block = {}
+
+        block.step = function(a)
+          if not block.q then
+            block.q = a
+          else
+            local d = a - block.q
+            local r = RATE * block.parent.ellapsedS
+            if math.abs(d) > r then
+              if d > 0 then
+                block.q = block.q + r
+              else
+                block.q = block.q - r
+              end
+            else
+              block.q = a
+            end
+          end
+          return block.q
+        end
+
+        return block
+      ]==]
+    local replaces = {
+      ['RATE'] = self.parameter.rate,
+    }
+    return string.gsub(source, '%a+', replaces)
+  end,
+
+}
+
