@@ -1,6 +1,7 @@
 -- 26.12.2017 11:15:56 AR V1.0a
 
 generic = {
+  name = 'Quantizer',
   parameter = {
     interval = 0.1,
   },
@@ -13,7 +14,7 @@ generic = {
   end,
 
   open = function(self)
-    gui.add('Info', 'Info', 'Quantizer', [[
+    gui.add('Info', 'Info', self.name, [[
 Apply a stair-step function that output is symmetric to zero.
 Interval is the step height.
 ]])

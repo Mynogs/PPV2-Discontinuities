@@ -2,6 +2,7 @@
 -- 30.12.2016 11:23:41 AR V1.0b
 
 generic = {
+  name = 'Saturation',
   parameter = {
     upperSaturation = 1.0,
     lowerSaturation = 0.0,
@@ -15,7 +16,7 @@ generic = {
   end,
 
   open = function(self)
-    gui.add('Info', 'Info', 'Saturation', 'Limit input signal to the upper and lower\nsaturation values')
+    gui.add('Info', 'Info', self.name, 'Limit input signal to the upper and lower\nsaturation values')
     gui.add('Edit', 'EditUpperSaturation', 'Upper saturation')
     gui.set('EditUpperSaturation', 'Number', self.parameter.upperSaturation)
     gui.add('Edit', 'EditLowerSaturation', 'Lower saturation')
@@ -26,6 +27,10 @@ generic = {
   apply = function(self)
     self.parameter.upperSaturation = gui.get('EditUpperSaturation', 'Number')
     self.parameter.lowerSaturation = gui.get('EditLowerSaturation', 'Number')
+    return gui.assert(
+      self.name,
+      self.parameter.upperSaturation > self.parameter.lowerSaturation, 'Upper stauration bust be greater then lower satuarion'
+    )
   end,
 
   close = function()

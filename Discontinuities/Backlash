@@ -15,7 +15,7 @@ generic = {
     gui.add('Info', 'Info', 'Deadband', [[
 If the in-/output difference less then Deadband / 2 the output don't change.
 Otherwise the output follows the input with a difference of Deadband / 2.
-This is the simulation of a 'drag indicator'-
+This is the simulation of a drag indicator
 ]])
     gui.add('Edit', 'EditDeadband', 'Deadband')
     gui.set('EditDeadband', 'Number', self.parameter.deadband)

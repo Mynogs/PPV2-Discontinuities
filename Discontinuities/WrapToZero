@@ -1,0 +1,68 @@
+-- 24.12.2018 14:43:38 AR V1.0a
+
+generic = {
+  name = 'Warp To Zero',
+  parameter = {
+    upperThreshold = 1.0,
+    lowerThreshold = -1.0,
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', self.name, 'If input is above the upper or below the lower threshold the output is zero.')
+    gui.add('Edit', 'EditUpperThreshold', 'Upper threshold')
+    gui.set('EditUpperThreshold', 'Number', self.parameter.upperThreshold)
+    gui.add('Edit', 'EditLowerThreshold', 'Lower threshold')
+    gui.set('EditLowerThreshold', 'Number', self.parameter.lowerThreshold)
+    gui.setSize()
+  end,
+
+  apply = function(self)
+    self.parameter.upperThreshold = gui.get('EditUpperThreshold', 'Number')
+    self.parameter.lowerThreshold = gui.get('EditLowerThreshold', 'Number')
+    return gui.assert(
+      self.name,
+      self.parameter.upperThreshold > self.parameter.lowerThreshold, 'Upper threshold bust be greater then lower threshold'
+    )
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "", [[
+      draw.line(px(15), py(50), px(85), py(50))
+      draw.line(px(50), py(15), px(50), py(85))
+      draw.line(px(20), py(50), px(20), py(80), px(80), py(20), px(80), py(50))
+    ]])
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        return {
+
+          step = function(a)
+            if a < LOWER or a > UPPER then
+              return 0
+            end
+            return a
+          end
+
+        }
+      ]==]
+    local replaces = {
+      ['UPPER'] = self.parameter.upperThreshold,
+      ['LOWER'] = self.parameter.lowerThreshold,
+    }
+    return string.gsub(source, '%a+', replaces)
+  end,
+
+}
+

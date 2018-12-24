@@ -1,6 +1,7 @@
 -- 24.12.2018 11:57:43 AR V1.0a
 
 generic = {
+  name = 'Rate',
   parameter = {
     rate = 1.0,
   },
@@ -13,7 +14,7 @@ generic = {
   end,
 
   open = function(self)
-    gui.add('Info', 'Info', 'Rate', 'Output signal will no change faster then the rate')
+    gui.add('Info', 'Info', self.name, 'Output signal will no change faster then the rate')
     gui.add('Edit', 'EditRate', 'Rate [1/s]')
     gui.set('EditRate', 'Number', self.parameter.rate)
     gui.setSize()
@@ -21,6 +22,10 @@ generic = {
 
   apply = function(self)
     self.parameter.rate = gui.get('EditRate', 'Number')
+    return gui.assert(
+      self.name,
+      self.parameter.rate, 'Rate must be > 0.0'
+    )
   end,
 
   close = function()

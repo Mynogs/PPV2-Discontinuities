@@ -1,5 +1,6 @@
 
 generic = {
+  name = 'Dead Zone',
   parameter = {
     upper = 0.5,
     lower = -0.5,
@@ -13,7 +14,7 @@ generic = {
   end,
 
   open = function(self)
-    gui.add('Info', 'Info', 'Dead Zone', 'Output zero within a specified region (dead zone)')
+    gui.add('Info', 'Info', self.name, 'Output zero within a specified region (dead zone)')
     gui.add('Edit', 'EditUpper', 'Upper limit')
     gui.add('Edit', 'EditLower', 'Lower limit')
     gui.set('EditUpper', 'Number', self.parameter.upper)
@@ -24,6 +25,10 @@ generic = {
   apply = function(self)
     self.parameter.upper = gui.get('EditUpper', 'Number')
     self.parameter.lower = gui.get('EditLower', 'Number')
+    return gui.assert(
+      self.name,
+      self.parameter.upper > self.parameter.lower, 'Upper limit bust be greater then lower limit'
+    )
   end,
 
   close = function()
