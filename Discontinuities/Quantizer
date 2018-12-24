@@ -1,0 +1,72 @@
+-- 26.12.2017 11:15:56 AR V1.0a
+
+generic = {
+  parameter = {
+    interval = 0.1,
+  },
+
+  init = function(self)
+    block.setInputsPinCount(1)
+    block.setOutputsPinCount(1)
+    block.modifyFlags('SupressStartFunctionCall', true)
+    block.modifyFlags('SupressStopFunctionCall', true)
+  end,
+
+  open = function(self)
+    gui.add('Info', 'Info', 'Quantizer', [[
+Apply a stair-step function that output is symmetric to zero.
+Interval is the step height.
+]])
+    gui.add('Edit', 'EditInterval', 'Interval')
+    gui.set('EditInterval', 'Number', self.parameter.interval)
+    gui.setSize()
+  end,
+
+  apply = function(self)
+    self.parameter.interval = gui.get('EditInterval', 'Number')
+    return gui.assert(
+      self.name,
+      self.parameter.interval > 0.0, 'Interval must be > 0.0'
+    )
+  end,
+
+  close = function()
+  end,
+
+  avatar = function(self)
+    return block.getDefaultAvatar(0x50, "", [[
+      local p = {px(15), py(90)}
+      for i = 20, 80, 10 do
+        p[#p + 1] = px(i - 5)
+        p[#p + 1] = py(100 - i)
+        p[#p + 1] = px(i + 5)
+        p[#p + 1] = py(100 - i)
+        p[#p + 1] = px(i + 5)
+        p[#p + 1] = py(90 - i)
+      end
+      draw.line(table.unpack(p))
+
+      draw.line(px(15), py(50), px(85), py(50))
+      draw.line(px(50), py(15), px(50), py(85))
+    ]])
+  end,
+
+  generate = function(self)
+    local source =
+      [==[
+        local block = {}
+
+          block.step = function(a)
+            return INTERVAL * math.floor(a / INTERVAL + 0.5)
+          end
+
+        return block
+      ]==]
+    local replaces = {
+      ['INTERVAL'] = self.parameter.interval,
+    }
+    return string.gsub(source, '%a+', replaces)
+  end,
+
+}
+
